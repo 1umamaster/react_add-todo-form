@@ -1,20 +1,11 @@
 import { TodoInfo } from '../TodoInfo/TodoInfo';
+import type { Todo } from '../../types';
 
-export const TodoList = ({
-  todos,
-}: {
-  todos: Array<{
-    id: number;
-    title: string;
-    userId: number;
-    completed: boolean;
-    user: { id: number; name: string; username: string; email: string };
-  }>;
-}) => {
+export const TodoList = ({ todos }: { todos: Todo[] }) => {
   return (
     <>
-      {todos.map(t => (
-        <TodoInfo key={t.id} todo={t} />
+      {todos.map(todo => (
+        <TodoInfo key={todo.id} todo={todo} />
       ))}
     </>
   );

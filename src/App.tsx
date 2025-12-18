@@ -3,15 +3,7 @@ import { useState } from 'react';
 import usersFromServer from './api/users';
 import todosFromServer from './api/todos';
 import { TodoList } from './components/TodoList/TodoList';
-
-type User = { id: number; name: string; username: string; email: string };
-type Todo = {
-  id: number;
-  title: string;
-  userId: number;
-  completed: boolean;
-  user: User;
-};
+import type { User, Todo } from './types';
 
 const sanitizeTitle = (value: string) => {
   // allow letters (any language), digits and spaces
@@ -19,9 +11,9 @@ const sanitizeTitle = (value: string) => {
 };
 
 export const App = () => {
-  const initialTodos: Todo[] = todosFromServer.map(t => ({
-    ...t,
-    user: usersFromServer.find(u => u.id === t.userId)!,
+  const initialTodos: Todo[] = todosFromServer.map(todoFromServer => ({
+    ...todoFromServer,
+    user: usersFromServer.find(user => user.id === todoFromServer.userId)!,
   }));
 
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
@@ -31,18 +23,18 @@ export const App = () => {
   const [userError, setUserError] = useState(false);
   const [submitClicked, setSubmitClicked] = useState(false);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = sanitizeTitle(e.target.value);
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = sanitizeTitle(event.target.value);
 
-    setTitle(v);
-    if (submitClicked && titleError && v.trim() !== '') {
+    setTitle(sanitized);
+    if (submitClicked && titleError && sanitized.trim() !== '') {
       setTitleError(false);
     }
   };
 
-  const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setUserId(e.target.value);
-    if (submitClicked && userError && e.target.value !== '0') {
+  const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setUserId(event.target.value);
+    if (submitClicked && userError && event.target.value !== '0') {
       setUserError(false);
     }
   };
@@ -62,15 +54,15 @@ export const App = () => {
     }
 
     const numericUserId = Number(userId);
-    const user = usersFromServer.find(u => u.id === numericUserId)!;
+    const foundUser = usersFromServer.find(user => user.id === numericUserId)!;
 
-    const maxId = todos.length ? Math.max(...todos.map(t => t.id)) : 0;
+    const maxId = todos.length ? Math.max(...todos.map(todo => todo.id)) : 0;
     const newTodo: Todo = {
       id: maxId + 1,
       title: title.trim(),
       userId: numericUserId,
       completed: false,
-      user,
+      user: foundUser,
     };
 
     setTodos([...todos, newTodo]);
@@ -115,9 +107,9 @@ export const App = () => {
               <option value="0" disabled>
                 Choose a user
               </option>
-              {usersFromServer.map((u: User) => (
-                <option key={u.id} value={u.id}>
-                  {u.name}
+              {usersFromServer.map((user: User) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
                 </option>
               ))}
             </select>

@@ -1,16 +1,7 @@
 import { UserInfo } from '../UserInfo/UserInfo';
+import type { Todo } from '../../types';
 
-export const TodoInfo = ({
-  todo,
-}: {
-  todo: {
-    id: number;
-    title: string;
-    userId: number;
-    completed: boolean;
-    user: { id: number; name: string; username: string; email: string };
-  };
-}) => {
+export const TodoInfo = ({ todo }: { todo: Todo }) => {
   return (
     <article
       data-id={todo.id}
